@@ -38,14 +38,30 @@ export default function SignupPage() {
     setIsLoading(true);
     
     try {
-      // In a real app, you would make an API call here
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          outletName: formData.outletName,
+          email: formData.email,
+          password: formData.password,
+          address: formData.address,
+          phone: formData.phone,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Registration failed");
+      }
       
       toast.success("Registration successful!");
-      router.push("/admin");
-    } catch (error) {
+      router.push("/login");
+    } catch (error: any) {
       console.error("Registration failed:", error);
-      toast.error("Registration failed. Please try again.");
+      toast.error(error.message || "Registration failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
